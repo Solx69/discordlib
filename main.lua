@@ -1,5 +1,3 @@
-print("hey")
-
 do
 	local coreGui = game:GetService("CoreGui")
 	local ui;
@@ -2872,7 +2870,7 @@ function DiscordLib:Window(text)
 				end
 				return DropFunc
 			end
-            function ChannelContent:Checkist(text,list,callback)
+            function ChannelContent:Checklist(text,list,callback)
 				local DropFunc = {}
 				local itemcount = 0
 				local framesize = 0
@@ -3636,3 +3634,5 @@ function DiscordLib:Window(text)
 	return ServerHold
 end
 return DiscordLib
+
+print("ok")
