@@ -1,4 +1,4 @@
-print("ur mom")
+print("ily<3")
 
 do
 	local coreGui = game:GetService("CoreGui")
@@ -2872,7 +2872,7 @@ function DiscordLib:Window(text)
 				end
 				return DropFunc
 			end
-            function ChannelContent:Checklist(text,list,callback)
+            function ChannelContent:Checklist(text,list,whitelist,defaults,callback)
 				local DropFunc = {}
 				local itemcount = 0
 				local framesize = 0
@@ -2886,7 +2886,6 @@ function DiscordLib:Window(text)
 				local CurrentSelectedText = Instance.new("TextLabel")
 				local ArrowImg = Instance.new("ImageLabel")
 				local ChecklistFrameBtn = Instance.new("TextButton")
-                local ChecklistBtnStatus = Instance.new("ImageLabel")
 
 				Checklist.Name = "Checklist"
 				Checklist.Parent = ChannelHolder
@@ -2960,15 +2959,6 @@ function DiscordLib:Window(text)
 				ChecklistFrameBtn.Text = ""
 				ChecklistFrameBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
 				ChecklistFrameBtn.TextSize = 14.000
-
-                ChecklistBtnStatus.Name = "ChecklistBtnStatus"
-                ChecklistBtnStatus.Parent = ChecklistFrameBtn
-                ChecklistBtnStatus.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                ChecklistBtnStatus.BackgroundTransparency = 1.000
-                ChecklistBtnStatus.Position = UDim2.new(1.84974098, 0, 0.167428851, 0)
-                ChecklistBtnStatus.Size = UDim2.new(0, 22, 0, 22)
-                ChecklistBtnStatus.Image = "http://www.roblox.com/asset/?id=7847034997"
-                ChecklistBtnStatus.ImageColor3 = Color3.fromRGB(212, 212, 212)
 
 				local ChecklistFrameMainOutline = Instance.new("Frame")
 				local ChecklistFrameMainOutlineCorner = Instance.new("UICorner")
@@ -3044,6 +3034,7 @@ function DiscordLib:Window(text)
 						ChecklistFrameMainOutline.Visible = false
 						ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 					end
+					DropTog = not DropTog
 				end)
 				
 				
@@ -3061,6 +3052,9 @@ function DiscordLib:Window(text)
 					local Item = Instance.new("TextButton")
 					local ItemCorner = Instance.new("UICorner")
 					local ItemText = Instance.new("TextLabel")
+                    local ItemImage = Instance.new("ImageLabel")
+                    local ItemToggle = Instance.new("BoolValue")
+                    local true_image,false_image = "http://www.roblox.com/asset/?id=7847296406","http://www.roblox.com/asset/?id=7847295837"
 
 					Item.Name = "Item"
 					Item.Parent = DropItemHolder
@@ -3088,6 +3082,27 @@ function DiscordLib:Window(text)
 					ItemText.TextSize = 14.000
 					ItemText.TextXAlignment = Enum.TextXAlignment.Left
 					ItemText.Text = v
+
+                    ItemImage.Name = "ItemImage"
+                    ItemImage.Parent = Item
+                    ItemImage.BackgroundColor3 = Color3.fromRGB(42, 44, 48)
+                    ItemImage.BackgroundTransparency = 1.000
+                    ItemImage.Position = UDim2.new(0.9, 0, 0, 0)
+                    ItemImage.Size = UDim2.new(0, 29, 0, 29)
+                    ItemImage.BorderSizePixel = 0
+                    ItemImage.Image = false_image
+
+                    ItemToggle.Name = "ItemToggle"
+                    ItemToggle.Parent = Item
+                    ItemToggle.Value = false
+
+                    if defaults and table.find(defaults,v) then
+                        ItemImage.Image = true_image
+                        ItemToggle.Value = true
+                        if not table.find(whitelist,v) then
+                            table.insert(whitelist,v)
+                        end
+                    end
 					
 					Item.MouseEnter:Connect(function()
 						ItemText.TextColor3 = Color3.fromRGB(255,255,255)
@@ -3100,13 +3115,21 @@ function DiscordLib:Window(text)
 					end)
 					
 					Item.MouseButton1Click:Connect(function()
-						CurrentSelectedText.Text = v
-						pcall(callback, v)
-						Checklist.Size = UDim2.new(0, 403, 0, 73)
-						ChecklistFrameMain.Visible = false
-						ChecklistFrameMainOutline.Visible = false
-						ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
-						DropTog = not DropTog
+                        if ItemToggle.Value == false then
+                            if not table.find(whitelist,v) then
+                                table.insert(whitelist,v)
+                            end
+                            ItemToggle.Value = true
+                            ItemImage.Image = true_image
+                        else
+                            if table.find(whitelist,v) then
+                                local num = table.find(whitelist,v)
+                                table.remove(whitelist,num)
+                            end
+                            ItemToggle.Value = false
+                            ItemImage.Image = false_image
+                        end
+                        pcall(callback, ItemToggle.Value, v)
 					end)
 					
 					DropItemHolder.CanvasSize = UDim2.new(0,0,0,DropItemHolderLayout.AbsoluteContentSize.Y)
