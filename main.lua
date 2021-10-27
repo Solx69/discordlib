@@ -2960,7 +2960,7 @@ function DiscordLib:Window(text)
 				ChecklistFrameBtn.TextSize = 14.000
 
                 ChecklistBtnStatus.Name = "ChecklistBtnStatus"
-                ChecklistBtnStatus.Parent = ChecklistFrame
+                ChecklistBtnStatus.Parent = ChecklistFrameBtn
                 ChecklistBtnStatus.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                 ChecklistBtnStatus.BackgroundTransparency = 1.000
                 ChecklistBtnStatus.Position = UDim2.new(1.84974098, 0, 0.167428851, 0)
@@ -3635,4 +3635,4 @@ function DiscordLib:Window(text)
 end
 return DiscordLib
 
-print("ok")
+print("k")
