@@ -2870,7 +2870,7 @@ function DiscordLib:Window(text)
 				end
 				return DropFunc
 			end
-            function ChannelContent:Checkist(text,list,callback,defaults)
+            function ChannelContent:Checkist(text,list,callback)
 				local DropFunc = {}
 				local itemcount = 0
 				local framesize = 0
