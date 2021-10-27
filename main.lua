@@ -3042,7 +3042,6 @@ function DiscordLib:Window(text)
 						ChecklistFrameMainOutline.Visible = false
 						ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 					end
-					DropTog = not DropTog
 				end)
 				
 				
@@ -3635,4 +3634,4 @@ function DiscordLib:Window(text)
 end
 return DiscordLib
 
-print("k")
+print("ur mom")
