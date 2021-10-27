@@ -390,6 +390,30 @@ function DiscordLib:Window(text)
 			minimized = not minimized
 		end
 	)
+
+	local uitoggled = true
+	function DiscordLib:Toggle()
+		if uitoggled then
+			MainFrame:TweenSize(
+				UDim2.new(0, 0, 0, 0),
+				Enum.EasingDirection.Out,
+				Enum.EasingStyle.Quart,
+				.3,
+				true
+			)
+			DiscordLib.Enabled = false
+		else
+			MainFrame:TweenSize(
+				UDim2.new(0, 681, 0, 396),
+				Enum.EasingDirection.Out,
+				Enum.EasingStyle.Quart,
+				.3,
+				true
+			)
+			DiscordLib.Enabled = true
+		end
+		uitoggled = not uitoggled
+	end
 	
 	local SettingsOpenBtn = Instance.new("TextButton")
 	local SettingsOpenBtnIco = Instance.new("ImageLabel")
@@ -3642,7 +3666,7 @@ function DiscordLib:Window(text)
 				function(current, pressed)
 					if not pressed then
 						if current.KeyCode.Name == Key then
-							pcall(callback)
+							pcall(callback,Key)
 						end
 					end
 				end
