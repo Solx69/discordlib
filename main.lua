@@ -3111,8 +3111,9 @@ function DiscordLib:Window(text)
                     ItemImage.Parent = Item
                     ItemImage.BackgroundColor3 = Color3.fromRGB(42, 44, 48)
                     ItemImage.BackgroundTransparency = 1.000
-                    ItemImage.Position = UDim2.new(0.9, 0, 0, 0)
+                    ItemImage.Position = UDim2.new(0.9, 0, 0.5, 0)
                     ItemImage.Size = UDim2.new(0, 29, 0, 29)
+					ItemImage.AnchorPoint = Vector2.new(0.5,0.5)
                     ItemImage.BorderSizePixel = 0
                     ItemImage.Image = false_image
 
@@ -3154,6 +3155,9 @@ function DiscordLib:Window(text)
                             ItemImage.Image = false_image
                         end
                         pcall(callback, ItemToggle.Value, v)
+						ItemImage:TweenSize(UDim2.new(0, 20, 0, 20), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .1, true)
+						wait(0.1)
+						ItemImage:TweenSize(UDim2.new(0, 29, 0, 29), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .1, true)
 					end)
 					
 					DropItemHolder.CanvasSize = UDim2.new(0,0,0,DropItemHolderLayout.AbsoluteContentSize.Y)
