@@ -1,3 +1,5 @@
+print("hey")
+
 do
 	local coreGui = game:GetService("CoreGui")
 	local ui;
