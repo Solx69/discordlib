@@ -1,3 +1,5 @@
+print("ur mom")
+
 do
 	local coreGui = game:GetService("CoreGui")
 	local ui;
@@ -3633,5 +3635,3 @@ function DiscordLib:Window(text)
 	return ServerHold
 end
 return DiscordLib
-
-print("ur mom")
