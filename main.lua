@@ -2283,34 +2283,47 @@ function DiscordLib:Window(text)
 
 				ToggleFrame.Name = "ToggleFrame"
 				ToggleFrame.Parent = Toggle
-				ToggleFrame.BackgroundColor3 = Color3.fromRGB(114, 118, 125)
 				ToggleFrame.Position = UDim2.new(0.900481343, -5, 0.13300018, 0)
 				ToggleFrame.Size = UDim2.new(0, 40, 0, 21)
+
+				ToggleFrameCircleCorner.CornerRadius = UDim.new(1, 0)
+				ToggleFrameCircleCorner.Name = "ToggleFrameCircleCorner"
+				ToggleFrameCircleCorner.Parent = ToggleFrameCircle
+				ToggleFrameCircle.Parent = ToggleFrame
+				ToggleFrameCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				ToggleFrameCircle.Size = UDim2.new(0, 15, 0, 15)
 
 				ToggleFrameCorner.CornerRadius = UDim.new(1, 8)
 				ToggleFrameCorner.Name = "ToggleFrameCorner"
 				ToggleFrameCorner.Parent = ToggleFrame
 
-				ToggleFrameCircle.Name = "ToggleFrameCircle"
-				ToggleFrameCircle.Parent = ToggleFrame
-				ToggleFrameCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-				ToggleFrameCircle.Position = UDim2.new(0.234999999, -5, 0.133000001, 0)
-				ToggleFrameCircle.Size = UDim2.new(0, 15, 0, 15)
-
-				ToggleFrameCircleCorner.CornerRadius = UDim.new(1, 0)
-				ToggleFrameCircleCorner.Name = "ToggleFrameCircleCorner"
-				ToggleFrameCircleCorner.Parent = ToggleFrameCircle
-
 				Icon.Name = "Icon"
 				Icon.Parent = ToggleFrameCircle
 				Icon.AnchorPoint = Vector2.new(0.5, 0.5)
-				Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 				Icon.BackgroundTransparency = 1.000
 				Icon.BorderColor3 = Color3.fromRGB(27, 42, 53)
 				Icon.Position = UDim2.new(0, 8, 0, 8)
 				Icon.Size = UDim2.new(0, 13, 0, 13)
-				Icon.Image = "http://www.roblox.com/asset/?id=6035047409"
-				Icon.ImageColor3 = Color3.fromRGB(114, 118, 125)
+
+				if toggled == false then
+					ToggleFrame.BackgroundColor3 = Color3.fromRGB(114, 118, 125)
+
+					ToggleFrameCircle.Name = "ToggleFrameCircle"
+					ToggleFrameCircle.Position = UDim2.new(0.234999999, -5, 0.133000001, 0)
+
+					Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+					Icon.Image = "http://www.roblox.com/asset/?id=6035047409"
+					Icon.ImageColor3 = Color3.fromRGB(114, 118, 125)
+				else
+					ToggleFrame.BackgroundColor3 = Color3.fromRGB(67,181,129)
+
+					ToggleFrameCircle.Name = "ToggleFrameCircle"
+					ToggleFrameCircle.Position = UDim2.new(0.655, -5, 0.133000001, 0)
+
+					Icon.BackgroundColor3 = Color3.fromRGB(67,181,129)
+					Icon.Image = "http://www.roblox.com/asset/?id=6023426926"
+					Icon.ImageColor3 = Color3.fromRGB(67,181,129)
+				end
 				
 				Toggle.MouseButton1Click:Connect(function()
 					if toggled == false then
