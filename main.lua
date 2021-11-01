@@ -2202,7 +2202,10 @@ function DiscordLib:Window(text)
 				ChannelHolder.Visible = true
 			end
 			local ChannelContent = {}
-			function ChannelContent:Button(text,callback)
+			function ChannelContent:Button(...)
+				local options = ...
+				local text = options.text or ""
+				local callback = options.callback or nil
 				local Button = Instance.new("TextButton")
 				local ButtonCorner = Instance.new("UICorner")
 
@@ -2247,7 +2250,11 @@ function DiscordLib:Window(text)
 				end)
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 			end
-			function ChannelContent:Toggle(text,default,callback)
+			function ChannelContent:Toggle(...)
+				local options = ...
+				local text = options.text or ""
+				local default = options.default or false
+				local callback = options.callback or nil
 				local toggled = default
 				local Toggle = Instance.new("TextButton")
 				local ToggleTitle = Instance.new("TextLabel")
@@ -2382,7 +2389,13 @@ function DiscordLib:Window(text)
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 			end
 			
-			function ChannelContent:Slider(text, min, max, start, callback)
+			function ChannelContent:Slider(...)
+				local options = ...
+				local text = options.text or ""
+				local min = options.min or 0
+				local max = options.max or 1
+				local start = options.default or min
+				local callback = options.callback or nil
 				local SliderFunc = {}
 				local dragging = false
 				local Slider = Instance.new("TextButton")
@@ -2582,7 +2595,11 @@ function DiscordLib:Window(text)
 				Seperator2.Size = UDim2.new(0, 401, 0, 1)
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 			end
-			function ChannelContent:Dropdown(text, list, callback)
+			function ChannelContent:Dropdown(...)
+				local options = ...
+				local text = options.text or ""
+				local list = options.list or {}
+				local callback = options.callback or nil
 				local DropFunc = {}
 				local itemcount = 0
 				local framesize = 0
@@ -2909,7 +2926,13 @@ function DiscordLib:Window(text)
 				end
 				return DropFunc
 			end
-            function ChannelContent:Checklist(text,list,whitelist,defaults,callback)
+            function ChannelContent:Checklist(...)
+				local options = ...
+				local text = options.text or ""
+				local list = options.list or {}
+				local whitelist = options.whitelist or {}
+				local defaults = options.defaults or {}
+				local callback = options.callback or nil
 				local DropFunc = {}
 				local itemcount = 0
 				local framesize = 0
@@ -3506,7 +3529,13 @@ function DiscordLib:Window(text)
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 			end
 			
-			function ChannelContent:Textbox(text, placetext, disapper, callback)
+			function ChannelContent:Textbox(...)
+				local options = ...
+				local text = options.text or ""
+				local default = options.default or ""
+				local disappear = options.disappear or false
+				local callback = options.callback or nil
+
 				local Textbox = Instance.new("Frame")
 				local TextboxTitle = Instance.new("TextLabel")
 				local TextboxFrameOutline = Instance.new("Frame")
@@ -3564,7 +3593,7 @@ function DiscordLib:Window(text)
 				TextBox.Size = UDim2.new(0, 377, 0, 32)
 				TextBox.Font = Enum.Font.Gotham
 				TextBox.PlaceholderColor3 = Color3.fromRGB(91, 95, 101)
-				TextBox.PlaceholderText = placetext
+				TextBox.PlaceholderText = default
 				TextBox.Text = ""
 				TextBox.TextColor3 = Color3.fromRGB(193, 195, 197)
 				TextBox.TextSize = 14.000
@@ -3587,7 +3616,7 @@ function DiscordLib:Window(text)
 					if ep then
 						if #TextBox.Text > 0 then
 							pcall(callback, TextBox.Text)
-							if disapper then
+							if disappear then
 								TextBox.Text = ""
 							end
 						end
@@ -3628,8 +3657,13 @@ function DiscordLib:Window(text)
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 			end
 			
-			function ChannelContent:Bind(text, presetbind, callback)
-				local Key = presetbind.Name
+			function ChannelContent:Bind(...)
+				local options = ...
+				local text = options.text or ""
+				local default = options.default or nil
+				local callback = options.callback or nil
+
+				local Key = default.Name
 				local Keybind = Instance.new("TextButton")
 				local KeybindTitle = Instance.new("TextLabel")
 				local KeybindText = Instance.new("TextLabel")
@@ -3665,7 +3699,7 @@ function DiscordLib:Window(text)
 				KeybindText.Position = UDim2.new(0, 316, 0, 0)
 				KeybindText.Size = UDim2.new(0, 85, 0, 30)
 				KeybindText.Font = Enum.Font.Gotham
-				KeybindText.Text = presetbind.Name
+				KeybindText.Text = default.Name
 				KeybindText.TextColor3 = Color3.fromRGB(127, 131, 137)
 				KeybindText.TextSize = 14.000
 				KeybindText.TextXAlignment = Enum.TextXAlignment.Right
