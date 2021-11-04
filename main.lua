@@ -3795,7 +3795,7 @@ function DiscordLib:Window(text)
 				LabelTitle.Position = UDim2.new(0, 5, 0, 0)
 				LabelTitle.Size = UDim2.new(0, 200, 0, 30)
 				LabelTitle.Font = Enum.Font.Gotham
-				LabelTitle.Text = options.title
+				LabelTitle.Text = options.text
 				LabelTitle.TextColor3 = Color3.fromRGB(127, 131, 137)
 				LabelTitle.TextSize = 14.000
 				LabelTitle.TextXAlignment = Enum.TextXAlignment.Left
