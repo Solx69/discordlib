@@ -120,6 +120,20 @@ Discord.Name = random_string(20)
 Discord.Parent = game.CoreGui
 Discord.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
+local utility = {}
+local objects = {}
+
+function utility:Create(instance, properties, children)
+	local object = Instance.new(instance)
+	for i, v in pairs(properties or {}) do
+		object[i] = v
+	end
+	for i, module in pairs(children or {}) do
+		module.Parent = object
+	end
+	return object
+end
+
 function DiscordLib:Window(text)
 	local currentservertoggled = ""
 	local minimized = false
@@ -2232,7 +2246,7 @@ function DiscordLib:Window(text)
 				end)
 				
 				Button.MouseButton1Click:Connect(function()
-					pcall(callback)
+					pcall(options.callback)
 					Button.TextSize = 0
 					TweenService:Create(
 						Button,
@@ -2248,14 +2262,28 @@ function DiscordLib:Window(text)
 						{BackgroundColor3 = Color3.fromRGB(114, 137, 228)}
 					):Play()
 				end)
+
+				function options:Update(...)
+					local aOptions = ...
+					for i,v in pairs(aOptions) do
+						if v ~= "Update" then
+							options[i] = v
+						end
+					end
+					if aOptions.title ~= nil then
+						ChannelBtnTitle.Text = options.title
+					end
+				end
+
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
+				return options
 			end
 			function ChannelContent:Toggle(...)
 				local options = ...
 				local text = options.text or ""
 				local default = options.default or false
 				local callback = options.callback or nil
-				local toggled = default
+				local toggled = options.default
 				local Toggle = Instance.new("TextButton")
 				local ToggleTitle = Instance.new("TextLabel")
 				local ToggleFrame = Instance.new("Frame")
@@ -2383,20 +2411,33 @@ function DiscordLib:Window(text)
 						):Play()
 					end
 					toggled = not toggled
-					pcall(callback, toggled)
+					pcall(options.callback, toggled)
 				end)
+
+				function options:Update(...)
+					local aOptions = ...
+					for i,v in pairs(aOptions) do
+						if v ~= "Update" then
+							options[i] = v
+						end
+					end
+					if aOptions.title ~= nil then
+						ToggleTitle.Text = options.title
+					end
+				end
 				
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
+				return options
 			end
 			
 			function ChannelContent:Slider(...)
 				local options = ...
 				local text = options.text or ""
-				local min = options.min or 0
-				local max = options.max or 1
-				local start = options.default or min
+				local min = options.options.min or 0
+				local max = options.options.max or 1
+				local start = options.default or options.min
 				local callback = options.callback or nil
-				local SliderFunc = {}
+
 				local dragging = false
 				local Slider = Instance.new("TextButton")
 				local SliderTitle = Instance.new("TextLabel")
@@ -2450,7 +2491,7 @@ function DiscordLib:Window(text)
 				CurrentValueFrame.Name = "CurrentValueFrame"
 				CurrentValueFrame.Parent = SliderFrame
 				CurrentValueFrame.BackgroundColor3 = Color3.fromRGB(114, 137, 218)
-				CurrentValueFrame.Size = UDim2.new((start or 0) / max, 0, 0, 8)
+				CurrentValueFrame.Size = UDim2.new((start or 0) / options.max, 0, 0, 8)
 
 				CurrentValueFrameCorner.Name = "CurrentValueFrameCorner"
 				CurrentValueFrameCorner.Parent = CurrentValueFrame
@@ -2458,7 +2499,7 @@ function DiscordLib:Window(text)
 				Zip.Name = "Zip"
 				Zip.Parent = SliderFrame
 				Zip.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-				Zip.Position = UDim2.new((start or 0)/max, -6,-0.644999981, 0)
+				Zip.Position = UDim2.new((start or 0)/options.max, -6,-0.644999981, 0)
 				Zip.Size = UDim2.new(0, 10, 0, 18)
 				ZipCorner.CornerRadius = UDim.new(0, 3)
 				ZipCorner.Name = "ZipCorner"
@@ -2518,7 +2559,7 @@ function DiscordLib:Window(text)
 				ValueLabel.BackgroundTransparency = 1.000
 				ValueLabel.Size = UDim2.new(0, 36, 0, 21)
 				ValueLabel.Font = Enum.Font.Gotham
-				ValueLabel.Text = tostring(start and math.floor((start / max) * (max - min) + min) or 0)
+				ValueLabel.Text = tostring(start and math.floor((start / options.max) * (options.max - options.min) + options.min) or 0)
 				ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 				ValueLabel.TextSize = 10.000
 				local function move(input)
@@ -2538,7 +2579,7 @@ function DiscordLib:Window(text)
 						)
 					CurrentValueFrame.Size = pos1
 					Zip.Position = pos
-					local value = math.floor(((pos.X.Scale * max) / max) * (max - min) + min)
+					local value = math.floor(((pos.X.Scale * options.max) / options.max) * (options.max - options.min) + options.min)
 					ValueLabel.Text = tostring(value)
 					pcall(callback, value)
 				end
@@ -2566,15 +2607,27 @@ function DiscordLib:Window(text)
 				end
 				)
 				
-				function SliderFunc:Change(tochange)
-					CurrentValueFrame.Size = UDim2.new((tochange or 0) / max, 0, 0, 8)
-					Zip.Position = UDim2.new((tochange or 0)/max, -6,-0.644999981, 0)
-					ValueLabel.Text = tostring(tochange and math.floor((tochange / max) * (max - min) + min) or 0)
+				function options:Change(tochange)
+					CurrentValueFrame.Size = UDim2.new((tochange or 0) / options.max, 0, 0, 8)
+					Zip.Position = UDim2.new((tochange or 0)/options.max, -6,-0.644999981, 0)
+					ValueLabel.Text = tostring(tochange and math.floor((tochange / options.max) * (options.max - options.min) + options.min) or 0)
 					pcall(callback, tochange)
+				end
+
+				function options:Update(...)
+					local aOptions = ...
+					for i,v in pairs(aOptions) do
+						if v ~= "Update" and v ~= "Change" then
+							options[i] = v
+						end
+					end
+					if aOptions.title ~= nil then
+						SliderTitle.Text = options.title
+					end
 				end
 				
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
-				return SliderFunc
+				return options
 			end
 			function ChannelContent:Seperator()
 				local Seperator1 = Instance.new("Frame")
@@ -2599,8 +2652,8 @@ function DiscordLib:Window(text)
 				local options = ...
 				local text = options.text or ""
 				local list = options.list or {}
+				local default = options.default or {}
 				local callback = options.callback or nil
-				local DropFunc = {}
 				local itemcount = 0
 				local framesize = 0
 				local DropTog = false
@@ -2667,6 +2720,10 @@ function DiscordLib:Window(text)
 				CurrentSelectedText.TextColor3 = Color3.fromRGB(212, 212, 212)
 				CurrentSelectedText.TextSize = 14.000
 				CurrentSelectedText.TextXAlignment = Enum.TextXAlignment.Left
+				if default ~= nil then
+					CurrentSelectedText.Text = default
+					pcall(callback, default)
+				end
 
 				ArrowImg.Name = "ArrowImg"
 				ArrowImg.Parent = CurrentSelectedText
@@ -2764,79 +2821,80 @@ function DiscordLib:Window(text)
 					DropTog = not DropTog
 				end)
 				
-				
-				for i,v in next, list do
-					itemcount = itemcount + 1
-					
-					if itemcount == 1 then
-						framesize = 29
-					elseif itemcount == 2 then
-						framesize = 58
-					elseif itemcount >= 3 then
-						framesize = 87
-					end
-					
-					local Item = Instance.new("TextButton")
-					local ItemCorner = Instance.new("UICorner")
-					local ItemText = Instance.new("TextLabel")
+				local function CreateList()
+					for i,v in next, options.list do
+						itemcount = itemcount + 1
+						
+						if itemcount == 1 then
+							framesize = 29
+						elseif itemcount == 2 then
+							framesize = 58
+						elseif itemcount >= 3 then
+							framesize = 87
+						end
+						
+						local Item = Instance.new("TextButton")
+						local ItemCorner = Instance.new("UICorner")
+						local ItemText = Instance.new("TextLabel")
 
-					Item.Name = "Item"
-					Item.Parent = DropItemHolder
-					Item.BackgroundColor3 = Color3.fromRGB(42, 44, 48)
-					Item.Size = UDim2.new(0, 379, 0, 29)
-					Item.AutoButtonColor = false
-					Item.Font = Enum.Font.SourceSans
-					Item.Text = ""
-					Item.TextColor3 = Color3.fromRGB(0, 0, 0)
-					Item.TextSize = 14.000
-					Item.BackgroundTransparency = 1
-
-					ItemCorner.CornerRadius = UDim.new(0, 4)
-					ItemCorner.Name = "ItemCorner"
-					ItemCorner.Parent = Item
-
-					ItemText.Name = "ItemText"
-					ItemText.Parent = Item
-					ItemText.BackgroundColor3 = Color3.fromRGB(42, 44, 48)
-					ItemText.BackgroundTransparency = 1.000
-					ItemText.Position = UDim2.new(0.0211081803, 0, 0, 0)
-					ItemText.Size = UDim2.new(0, 192, 0, 29)
-					ItemText.Font = Enum.Font.Gotham
-					ItemText.TextColor3 = Color3.fromRGB(212, 212, 212)
-					ItemText.TextSize = 14.000
-					ItemText.TextXAlignment = Enum.TextXAlignment.Left
-					ItemText.Text = v
-					
-					Item.MouseEnter:Connect(function()
-						ItemText.TextColor3 = Color3.fromRGB(255,255,255)
-						Item.BackgroundTransparency = 0
-					end)
-					
-					Item.MouseLeave:Connect(function()
-						ItemText.TextColor3 = Color3.fromRGB(212, 212, 212)
+						Item.Name = "Item"
+						Item.Parent = DropItemHolder
+						Item.BackgroundColor3 = Color3.fromRGB(42, 44, 48)
+						Item.Size = UDim2.new(0, 379, 0, 29)
+						Item.AutoButtonColor = false
+						Item.Font = Enum.Font.SourceSans
+						Item.Text = ""
+						Item.TextColor3 = Color3.fromRGB(0, 0, 0)
+						Item.TextSize = 14.000
 						Item.BackgroundTransparency = 1
-					end)
-					
-					Item.MouseButton1Click:Connect(function()
-						CurrentSelectedText.Text = v
-						pcall(callback, v)
-						Dropdown.Size = UDim2.new(0, 403, 0, 73)
-						DropdownFrameMain.Visible = false
-						DropdownFrameMainOutline.Visible = false
-						ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
-						DropTog = not DropTog
-					end)
-					
-					DropItemHolder.CanvasSize = UDim2.new(0,0,0,DropItemHolderLayout.AbsoluteContentSize.Y)
-					
-					DropItemHolder.Size = UDim2.new(0, 385, 0, framesize)
-					DropdownFrameMain.Size = UDim2.new(0, 392, 0, framesize + 6)
-					DropdownFrameMainOutline.Size = UDim2.new(0, 396, 0, framesize + 10)
+
+						ItemCorner.CornerRadius = UDim.new(0, 4)
+						ItemCorner.Name = "ItemCorner"
+						ItemCorner.Parent = Item
+
+						ItemText.Name = "ItemText"
+						ItemText.Parent = Item
+						ItemText.BackgroundColor3 = Color3.fromRGB(42, 44, 48)
+						ItemText.BackgroundTransparency = 1.000
+						ItemText.Position = UDim2.new(0.0211081803, 0, 0, 0)
+						ItemText.Size = UDim2.new(0, 192, 0, 29)
+						ItemText.Font = Enum.Font.Gotham
+						ItemText.TextColor3 = Color3.fromRGB(212, 212, 212)
+						ItemText.TextSize = 14.000
+						ItemText.TextXAlignment = Enum.TextXAlignment.Left
+						ItemText.Text = v
+						
+						Item.MouseEnter:Connect(function()
+							ItemText.TextColor3 = Color3.fromRGB(255,255,255)
+							Item.BackgroundTransparency = 0
+						end)
+						
+						Item.MouseLeave:Connect(function()
+							ItemText.TextColor3 = Color3.fromRGB(212, 212, 212)
+							Item.BackgroundTransparency = 1
+						end)
+						
+						Item.MouseButton1Click:Connect(function()
+							CurrentSelectedText.Text = v
+							pcall(callback, v)
+							Dropdown.Size = UDim2.new(0, 403, 0, 73)
+							DropdownFrameMain.Visible = false
+							DropdownFrameMainOutline.Visible = false
+							ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
+							DropTog = not DropTog
+						end)
+						
+						DropItemHolder.CanvasSize = UDim2.new(0,0,0,DropItemHolderLayout.AbsoluteContentSize.Y)
+						
+						DropItemHolder.Size = UDim2.new(0, 385, 0, framesize)
+						DropdownFrameMain.Size = UDim2.new(0, 392, 0, framesize + 6)
+						DropdownFrameMainOutline.Size = UDim2.new(0, 396, 0, framesize + 10)
+					end
 				end
 				
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 				
-				function DropFunc:Clear()
+				function options:Clear()
 					for i,v in next, DropItemHolder:GetChildren() do
 						if v.Name == "Item" then
 							v:Destroy()
@@ -2856,7 +2914,40 @@ function DiscordLib:Window(text)
 					ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 				end
 				
-				function DropFunc:Add(textadd)
+				function options:Update(...)
+					local aOptions = ...
+					for i,v in pairs(aOptions) do
+						if v ~= "Update" and v ~= "Clear" and v ~= "Add" then
+							options[i] = v
+						end
+					end
+					if aOptions.title ~= nil then
+						DropdownTitle.Text = options.title
+					end
+					if aOptions.list ~= nil then
+						for i,v in next, DropItemHolder:GetChildren() do
+							if v.Name == "Item" then
+								v:Destroy()
+							end
+						end					
+						
+						CurrentSelectedText.Text = "..."
+						
+						itemcount = 0
+						framesize = 0
+						DropItemHolder.Size = UDim2.new(0, 385, 0, 0)
+						ChecklistFrameMain.Size = UDim2.new(0, 392, 0, 0)
+						ChecklistFrameMainOutline.Size = UDim2.new(0, 396, 0, 0)
+						Checklist.Size = UDim2.new(0, 403, 0, 73)
+						ChecklistFrameMain.Visible = false
+						ChecklistFrameMainOutline.Visible = false
+						ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
+
+						CreateList()
+					end
+				end
+
+				function options:Add(textadd)
 					itemcount = itemcount + 1
 
 					if itemcount == 1 then
@@ -2924,19 +3015,19 @@ function DiscordLib:Window(text)
 					DropdownFrameMain.Size = UDim2.new(0, 392, 0, framesize + 6)
 					DropdownFrameMainOutline.Size = UDim2.new(0, 396, 0, framesize + 10)
 				end
-				return DropFunc
+				return options
 			end
+
             function ChannelContent:Checklist(...)
 				local options = ...
 				local text = options.text or ""
 				local list = options.list or {}
 				local whitelist = options.whitelist or {}
-				local defaults = options.defaults or {}
 				local callback = options.callback or nil
-				local DropFunc = {}
 				local itemcount = 0
 				local framesize = 0
 				local DropTog = false
+
 				local Checklist = Instance.new("Frame")
 				local ChecklistTitle = Instance.new("TextLabel")
 				local ChecklistFrameOutline = Instance.new("Frame")
@@ -2996,7 +3087,7 @@ function DiscordLib:Window(text)
 				CurrentSelectedText.Position = UDim2.new(0.0178571437, 0, 0, 0)
 				CurrentSelectedText.Size = UDim2.new(0, 193, 0, 32)
 				CurrentSelectedText.Font = Enum.Font.Gotham
-				CurrentSelectedText.Text = "..."
+				CurrentSelectedText.Text = "---"
 				CurrentSelectedText.TextColor3 = Color3.fromRGB(212, 212, 212)
 				CurrentSelectedText.TextSize = 14.000
 				CurrentSelectedText.TextXAlignment = Enum.TextXAlignment.Left
@@ -3097,120 +3188,122 @@ function DiscordLib:Window(text)
 					DropTog = not DropTog
 				end)
 				
-				
-				for i,v in next, list do
-					itemcount = itemcount + 1
-					
-					if itemcount == 1 then
-						framesize = 29
-					elseif itemcount == 2 then
-						framesize = 58
-					elseif itemcount >= 3 then
-						framesize = 87
-					end
-					
-					local Item = Instance.new("TextButton")
-					local ItemCorner = Instance.new("UICorner")
-					local ItemText = Instance.new("TextLabel")
-                    local ItemImage = Instance.new("ImageLabel")
-                    local ItemToggle = Instance.new("BoolValue")
-                    local true_image,false_image = "http://www.roblox.com/asset/?id=7847296406","http://www.roblox.com/asset/?id=7847295837"
+				local function CreateList()
+					for i,v in next, options.list do
+						itemcount = itemcount + 1
+						
+						if itemcount == 1 then
+							framesize = 29
+						elseif itemcount == 2 then
+							framesize = 58
+						elseif itemcount >= 3 then
+							framesize = 87
+						end
+						
+						local Item = Instance.new("TextButton")
+						local ItemCorner = Instance.new("UICorner")
+						local ItemText = Instance.new("TextLabel")
+						local ItemImage = Instance.new("ImageLabel")
+						local ItemToggle = Instance.new("BoolValue")
+						local true_image,false_image = "http://www.roblox.com/asset/?id=7847296406","http://www.roblox.com/asset/?id=7847295837"
 
-					Item.Name = "Item"
-					Item.Parent = DropItemHolder
-					Item.BackgroundColor3 = Color3.fromRGB(42, 44, 48)
-					Item.Size = UDim2.new(0, 379, 0, 29)
-					Item.AutoButtonColor = false
-					Item.Font = Enum.Font.SourceSans
-					Item.Text = ""
-					Item.TextColor3 = Color3.fromRGB(0, 0, 0)
-					Item.TextSize = 14.000
-					Item.BackgroundTransparency = 1
-
-					ItemCorner.CornerRadius = UDim.new(0, 4)
-					ItemCorner.Name = "ItemCorner"
-					ItemCorner.Parent = Item
-
-					ItemText.Name = "ItemText"
-					ItemText.Parent = Item
-					ItemText.BackgroundColor3 = Color3.fromRGB(42, 44, 48)
-					ItemText.BackgroundTransparency = 1.000
-					ItemText.Position = UDim2.new(0.0211081803, 0, 0, 0)
-					ItemText.Size = UDim2.new(0, 192, 0, 29)
-					ItemText.Font = Enum.Font.Gotham
-					ItemText.TextColor3 = Color3.fromRGB(212, 212, 212)
-					ItemText.TextSize = 14.000
-					ItemText.TextXAlignment = Enum.TextXAlignment.Left
-					ItemText.Text = v
-
-                    ItemImage.Name = "ItemImage"
-                    ItemImage.Parent = Item
-                    ItemImage.BackgroundColor3 = Color3.fromRGB(42, 44, 48)
-                    ItemImage.BackgroundTransparency = 1.000
-                    ItemImage.Position = UDim2.new(0.9, 0, 0.5, 0)
-                    ItemImage.Size = UDim2.new(0, 29, 0, 29)
-					ItemImage.AnchorPoint = Vector2.new(0.5,0.5)
-                    ItemImage.BorderSizePixel = 0
-                    ItemImage.Image = false_image
-
-                    ItemToggle.Name = "ItemToggle"
-                    ItemToggle.Parent = Item
-                    ItemToggle.Value = false
-
-                    if defaults and table.find(defaults,v) then
-                        ItemImage.Image = true_image
-                        ItemToggle.Value = true
-                        if not table.find(whitelist,v) then
-                            table.insert(whitelist,v)
-                        end
-                    end
-					
-					Item.MouseEnter:Connect(function()
-						ItemText.TextColor3 = Color3.fromRGB(255,255,255)
-						Item.BackgroundTransparency = 0
-					end)
-					
-					Item.MouseLeave:Connect(function()
-						ItemText.TextColor3 = Color3.fromRGB(212, 212, 212)
+						Item.Name = "Item"
+						Item.Parent = DropItemHolder
+						Item.BackgroundColor3 = Color3.fromRGB(42, 44, 48)
+						Item.Size = UDim2.new(0, 379, 0, 29)
+						Item.AutoButtonColor = false
+						Item.Font = Enum.Font.SourceSans
+						Item.Text = ""
+						Item.TextColor3 = Color3.fromRGB(0, 0, 0)
+						Item.TextSize = 14.000
 						Item.BackgroundTransparency = 1
-					end)
-					
-					Item.MouseButton1Click:Connect(function()
-                        if ItemToggle.Value == false then
-                            if not table.find(whitelist,v) then
-                                table.insert(whitelist,v)
-                            end
-                            ItemToggle.Value = true
-                            ItemImage.Image = true_image
-                        else
-                            if table.find(whitelist,v) then
-                                local num = table.find(whitelist,v)
-                                table.remove(whitelist,num)
-                            end
-                            ItemToggle.Value = false
-                            ItemImage.Image = false_image
-                        end
-                        pcall(callback, ItemToggle.Value, v)
-						ItemImage:TweenSize(UDim2.new(0, 20, 0, 20), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .1, true)
-						wait(0.1)
-						ItemImage:TweenSize(UDim2.new(0, 29, 0, 29), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .1, true)
-					end)
-					
-					DropItemHolder.CanvasSize = UDim2.new(0,0,0,DropItemHolderLayout.AbsoluteContentSize.Y)
-					
-					DropItemHolder.Size = UDim2.new(0, 385, 0, framesize)
-					ChecklistFrameMain.Size = UDim2.new(0, 392, 0, framesize + 6)
-					ChecklistFrameMainOutline.Size = UDim2.new(0, 396, 0, framesize + 10)
+
+						ItemCorner.CornerRadius = UDim.new(0, 4)
+						ItemCorner.Name = "ItemCorner"
+						ItemCorner.Parent = Item
+
+						ItemText.Name = "ItemText"
+						ItemText.Parent = Item
+						ItemText.BackgroundColor3 = Color3.fromRGB(42, 44, 48)
+						ItemText.BackgroundTransparency = 1.000
+						ItemText.Position = UDim2.new(0.0211081803, 0, 0, 0)
+						ItemText.Size = UDim2.new(0, 192, 0, 29)
+						ItemText.Font = Enum.Font.Gotham
+						ItemText.TextColor3 = Color3.fromRGB(212, 212, 212)
+						ItemText.TextSize = 14.000
+						ItemText.TextXAlignment = Enum.TextXAlignment.Left
+						ItemText.Text = v
+
+						ItemImage.Name = "ItemImage"
+						ItemImage.Parent = Item
+						ItemImage.BackgroundColor3 = Color3.fromRGB(42, 44, 48)
+						ItemImage.BackgroundTransparency = 1.000
+						ItemImage.Position = UDim2.new(0.9, 0, 0.5, 0)
+						ItemImage.Size = UDim2.new(0, 29, 0, 29)
+						ItemImage.AnchorPoint = Vector2.new(0.5,0.5)
+						ItemImage.BorderSizePixel = 0
+						ItemImage.Image = false_image
+
+						ItemToggle.Name = "ItemToggle"
+						ItemToggle.Parent = Item
+						ItemToggle.Value = false
+
+						if options.whitelist and table.find(options.whitelist,v) then
+							ItemImage.Image = true_image
+							ItemToggle.Value = true
+							if not table.find(options.whitelist,v) then
+								table.insert(options.whitelist,v)
+							end
+						end
+						
+						Item.MouseEnter:Connect(function()
+							ItemText.TextColor3 = Color3.fromRGB(255,255,255)
+							Item.BackgroundTransparency = 0
+						end)
+						
+						Item.MouseLeave:Connect(function()
+							ItemText.TextColor3 = Color3.fromRGB(212, 212, 212)
+							Item.BackgroundTransparency = 1
+						end)
+						
+						Item.MouseButton1Click:Connect(function()
+							if ItemToggle.Value == false then
+								if not table.find(options.whitelist,v) then
+									table.insert(options.whitelist,v)
+								end
+								ItemToggle.Value = true
+								ItemImage.Image = true_image
+							else
+								if table.find(options.whitelist,v) then
+									local num = table.find(options.whitelist,v)
+									table.remove(options.whitelist,num)
+								end
+								ItemToggle.Value = false
+								ItemImage.Image = false_image
+							end
+							pcall(options.callback, ItemToggle.Value, v)
+							ItemImage:TweenSize(UDim2.new(0, 20, 0, 20), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .1, true)
+							wait(0.1)
+							ItemImage:TweenSize(UDim2.new(0, 29, 0, 29), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .1, true)
+						end)
+						
+						DropItemHolder.CanvasSize = UDim2.new(0,0,0,DropItemHolderLayout.AbsoluteContentSize.Y)
+						
+						DropItemHolder.Size = UDim2.new(0, 385, 0, framesize)
+						ChecklistFrameMain.Size = UDim2.new(0, 392, 0, framesize + 6)
+						ChecklistFrameMainOutline.Size = UDim2.new(0, 396, 0, framesize + 10)
+					end
 				end
+				CreateList()
 				
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 				
-				function DropFunc:Clear()
+				function options:Clear()
 					for i,v in next, DropItemHolder:GetChildren() do
 						if v.Name == "Item" then
 							v:Destroy()
 						end
-                    end						
+                    end
 					
 					CurrentSelectedText.Text = "..."
 					
@@ -3224,8 +3317,41 @@ function DiscordLib:Window(text)
 					ChecklistFrameMainOutline.Visible = false
 					ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 				end
-				
-				function DropFunc:Add(textadd)
+
+				function options:Update(...)
+					local aOptions = ...
+					for i,v in pairs(aOptions) do
+						if v ~= "Update" and v ~= "Clear" and v ~= "Add" then
+							options[i] = v
+						end
+					end
+					if aOptions.title ~= nil then
+						ChecklistTitle.Text = options.title
+					end
+					if aOptions.list ~= nil then
+						for i,v in next, DropItemHolder:GetChildren() do
+							if v.Name == "Item" then
+								v:Destroy()
+							end
+						end					
+						
+						CurrentSelectedText.Text = "..."
+						
+						itemcount = 0
+						framesize = 0
+						DropItemHolder.Size = UDim2.new(0, 385, 0, 0)
+						ChecklistFrameMain.Size = UDim2.new(0, 392, 0, 0)
+						ChecklistFrameMainOutline.Size = UDim2.new(0, 396, 0, 0)
+						Checklist.Size = UDim2.new(0, 403, 0, 73)
+						ChecklistFrameMain.Visible = false
+						ChecklistFrameMainOutline.Visible = false
+						ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
+
+						CreateList()
+					end
+				end
+
+				function options:Add(textadd)
 					itemcount = itemcount + 1
 
 					if itemcount == 1 then
@@ -3279,7 +3405,7 @@ function DiscordLib:Window(text)
 
 					Item.MouseButton1Click:Connect(function()
 						CurrentSelectedText.Text = textadd
-						pcall(callback, textadd)
+						pcall(options.callback, textadd)
 						Checklist.Size = UDim2.new(0, 403, 0, 73)
 						ChecklistFrameMain.Visible = false
 						ChecklistFrameMainOutline.Visible = false
@@ -3293,10 +3419,15 @@ function DiscordLib:Window(text)
 					ChecklistFrameMain.Size = UDim2.new(0, 392, 0, framesize + 6)
 					ChecklistFrameMainOutline.Size = UDim2.new(0, 396, 0, framesize + 10)
 				end
-				return DropFunc
+				return options
             end
 
-			function ChannelContent:Colorpicker(text, preset, callback)
+			function ChannelContent:Colorpicker(...)
+				local options = ...
+				local text = options.text or ""
+				local default = options.default or nil
+				local callback = options.callback or nil
+
 				local OldToggleColor = Color3.fromRGB(0, 0, 0)
 				local OldColor = Color3.fromRGB(0, 0, 0)
 				local OldColorSelectionPosition = nil
@@ -3381,7 +3512,7 @@ function DiscordLib:Window(text)
 				ColorSelection.AnchorPoint = Vector2.new(0.5, 0.5)
 				ColorSelection.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 				ColorSelection.BackgroundTransparency = 1.000
-				ColorSelection.Position = UDim2.new(preset and select(3, Color3.toHSV(preset)))
+				ColorSelection.Position = UDim2.new(default and select(3, Color3.toHSV(default)))
 				ColorSelection.Size = UDim2.new(0, 18, 0, 18)
 				ColorSelection.Image = "http://www.roblox.com/asset/?id=4805639000"
 				ColorSelection.ScaleType = Enum.ScaleType.Fit
@@ -3414,13 +3545,13 @@ function DiscordLib:Window(text)
 				HueSelection.AnchorPoint = Vector2.new(0.5, 0.5)
 				HueSelection.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 				HueSelection.BackgroundTransparency = 1.000
-				HueSelection.Position = UDim2.new(0.48, 0, 1 - select(1, Color3.toHSV(preset)))
+				HueSelection.Position = UDim2.new(0.48, 0, 1 - select(1, Color3.toHSV(default)))
 				HueSelection.Size = UDim2.new(0, 18, 0, 18)
 				HueSelection.Image = "http://www.roblox.com/asset/?id=4805639000"
 
 				PresetClr.Name = "PresetClr"
 				PresetClr.Parent = ColorpickerFrame
-				PresetClr.BackgroundColor3 = preset
+				PresetClr.BackgroundColor3 = default
 				PresetClr.Position = UDim2.new(0.846153855, 0, 0.0740740746, 0)
 				PresetClr.Size = UDim2.new(0, 25, 0, 25)
 
@@ -3447,8 +3578,8 @@ function DiscordLib:Window(text)
 					(math.clamp(ColorSelection.AbsolutePosition.Y - Color.AbsolutePosition.Y, 0, Color.AbsoluteSize.Y) /
 						Color.AbsoluteSize.Y)
 
-				PresetClr.BackgroundColor3 = preset
-				Color.BackgroundColor3 = preset
+				PresetClr.BackgroundColor3 = default
+				Color.BackgroundColor3 = default
 				pcall(callback, PresetClr.BackgroundColor3)
 
 				Color.InputBegan:Connect(
@@ -3527,6 +3658,7 @@ function DiscordLib:Window(text)
 				)
 				
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
+				return options
 			end
 			
 			function ChannelContent:Textbox(...)
@@ -3615,18 +3747,32 @@ function DiscordLib:Window(text)
 					):Play()
 					if ep then
 						if #TextBox.Text > 0 then
-							pcall(callback, TextBox.Text)
+							pcall(options.callback, TextBox.Text)
 							if disappear then
 								TextBox.Text = ""
 							end
 						end
 					end
 				end)
+
+				function options:Update(...)
+					local aOptions = ...
+					for i,v in pairs(aOptions) do
+						if v ~= "Update" then
+							options[i] = v
+						end
+					end
+					if aOptions.title ~= nil then
+						TextboxTitle.Text = options.title
+					end
+				end
 				
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
+				return options
 			end
 			
-			function ChannelContent:Label(text)
+			function ChannelContent:Label(...)
+				local options = ...
 				local Label = Instance.new("TextButton")
 				local LabelTitle = Instance.new("TextLabel")
 
@@ -3649,11 +3795,23 @@ function DiscordLib:Window(text)
 				LabelTitle.Position = UDim2.new(0, 5, 0, 0)
 				LabelTitle.Size = UDim2.new(0, 200, 0, 30)
 				LabelTitle.Font = Enum.Font.Gotham
-				LabelTitle.Text = text
+				LabelTitle.Text = options.title
 				LabelTitle.TextColor3 = Color3.fromRGB(127, 131, 137)
 				LabelTitle.TextSize = 14.000
 				LabelTitle.TextXAlignment = Enum.TextXAlignment.Left
 				
+				function options:Update(...)
+					local aOptions = ...
+					for i,v in pairs(aOptions) do
+						if v ~= "Update" then
+							options[i] = v
+						end
+					end
+					if aOptions.title ~= nil then
+						LabelTitle.Text = options.title
+					end
+				end
+
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 			end
 			
@@ -3717,12 +3875,26 @@ function DiscordLib:Window(text)
 				function(current, pressed)
 					if not pressed then
 						if current.KeyCode.Name == Key then
-							pcall(callback,Key)
+							pcall(options.callback,Key)
 						end
 					end
 				end
 				)
+
+				function options:Update(...)
+					local aOptions = ...
+					for i,v in pairs(aOptions) do
+						if v ~= "Update" and v ~= "Change" then
+							options[i] = v
+						end
+					end
+					if aOptions.title ~= nil then
+						KeybindTitle.Text = options.title
+					end
+				end
+
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
+				return options
 			end
 			
 			return ChannelContent
