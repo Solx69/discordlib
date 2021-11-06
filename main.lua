@@ -2270,8 +2270,8 @@ function DiscordLib:Window(text)
 							options[i] = v
 						end
 					end
-					if aOptions.title ~= nil then
-						ChannelBtnTitle.Text = options.title
+					if aOptions.text ~= nil then
+						ChannelBtnTitle.Text = options.text
 					end
 				end
 
@@ -2283,7 +2283,7 @@ function DiscordLib:Window(text)
 				local text = options.text or ""
 				local default = options.default or false
 				local callback = options.callback or nil
-				local toggled = options.default
+				local toggled = options.default or false
 				local Toggle = Instance.new("TextButton")
 				local ToggleTitle = Instance.new("TextLabel")
 				local ToggleFrame = Instance.new("Frame")
@@ -2421,8 +2421,8 @@ function DiscordLib:Window(text)
 							options[i] = v
 						end
 					end
-					if aOptions.title ~= nil then
-						ToggleTitle.Text = options.title
+					if aOptions.text ~= nil then
+						ToggleTitle.Text = options.text
 					end
 				end
 				
@@ -2621,8 +2621,8 @@ function DiscordLib:Window(text)
 							options[i] = v
 						end
 					end
-					if aOptions.title ~= nil then
-						SliderTitle.Text = options.title
+					if aOptions.text ~= nil then
+						SliderTitle.Text = options.text
 					end
 				end
 				
@@ -2921,8 +2921,8 @@ function DiscordLib:Window(text)
 							options[i] = v
 						end
 					end
-					if aOptions.title ~= nil then
-						DropdownTitle.Text = options.title
+					if aOptions.text ~= nil then
+						DropdownTitle.Text = options.text
 					end
 					if aOptions.list ~= nil then
 						for i,v in next, DropItemHolder:GetChildren() do
@@ -3325,8 +3325,8 @@ function DiscordLib:Window(text)
 							options[i] = v
 						end
 					end
-					if aOptions.title ~= nil then
-						ChecklistTitle.Text = options.title
+					if aOptions.text ~= nil then
+						ChecklistTitle.Text = options.text
 					end
 					if aOptions.list ~= nil then
 						for i,v in next, DropItemHolder:GetChildren() do
@@ -3762,8 +3762,8 @@ function DiscordLib:Window(text)
 							options[i] = v
 						end
 					end
-					if aOptions.title ~= nil then
-						TextboxTitle.Text = options.title
+					if aOptions.text ~= nil then
+						TextboxTitle.Text = options.text
 					end
 				end
 				
@@ -3807,8 +3807,8 @@ function DiscordLib:Window(text)
 							options[i] = v
 						end
 					end
-					if aOptions.title ~= nil then
-						LabelTitle.Text = options.title
+					if aOptions.text ~= nil then
+						LabelTitle.Text = options.text
 					end
 				end
 
@@ -3888,8 +3888,8 @@ function DiscordLib:Window(text)
 							options[i] = v
 						end
 					end
-					if aOptions.title ~= nil then
-						KeybindTitle.Text = options.title
+					if aOptions.text ~= nil then
+						KeybindTitle.Text = options.text
 					end
 				end
 
