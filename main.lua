@@ -2433,8 +2433,8 @@ function DiscordLib:Window(text)
 			function ChannelContent:Slider(...)
 				local options = ...
 				local text = options.text or ""
-				local min = options.options.min or 0
-				local max = options.options.max or 1
+				local min = options.min or 0
+				local max = options.max or 1
 				local start = options.default or options.min
 				local callback = options.callback or nil
 
