@@ -2891,6 +2891,7 @@ function DiscordLib:Window(text)
 						DropdownFrameMainOutline.Size = UDim2.new(0, 396, 0, framesize + 10)
 					end
 				end
+				CreateList()
 				
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 				
