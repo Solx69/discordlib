@@ -2579,7 +2579,7 @@ function DiscordLib:Window(text)
 						)
 					CurrentValueFrame.Size = pos1
 					Zip.Position = pos
-					local value = math.floor(((pos.X.Scale * options.max) / options.max) * (options.max - options.min) + options.min)
+					local value = math.floor(pos.X.Scale * (options.max - options.min) + options.min)
 					ValueLabel.Text = tostring(value)
 					pcall(callback, value)
 				end
@@ -2652,7 +2652,7 @@ function DiscordLib:Window(text)
 				local options = ...
 				local text = options.text or ""
 				local list = options.list or {}
-				local default = options.default or {}
+				local default = options.default or ""
 				local callback = options.callback or nil
 				local itemcount = 0
 				local framesize = 0
@@ -2862,7 +2862,7 @@ function DiscordLib:Window(text)
 						ItemText.TextColor3 = Color3.fromRGB(212, 212, 212)
 						ItemText.TextSize = 14.000
 						ItemText.TextXAlignment = Enum.TextXAlignment.Left
-						ItemText.Text = v
+						ItemText.Text = tostring(v)
 						
 						Item.MouseEnter:Connect(function()
 							ItemText.TextColor3 = Color3.fromRGB(255,255,255)
@@ -2875,8 +2875,8 @@ function DiscordLib:Window(text)
 						end)
 						
 						Item.MouseButton1Click:Connect(function()
-							CurrentSelectedText.Text = v
-							pcall(callback, v)
+							CurrentSelectedText.Text = tostring(v)
+							pcall(callback, tostring(v))
 							Dropdown.Size = UDim2.new(0, 403, 0, 73)
 							DropdownFrameMain.Visible = false
 							DropdownFrameMainOutline.Visible = false
@@ -3897,10 +3897,8 @@ function DiscordLib:Window(text)
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
 				return options
 			end
-			
 			return ChannelContent
 		end
-		
 		return ChannelHold
 	end
 	return ServerHold
