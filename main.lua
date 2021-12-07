@@ -2424,6 +2424,28 @@ function DiscordLib:Window(text)
 					if aOptions.text ~= nil then
 						ToggleTitle.Text = options.text
 					end
+					if aOptions.toggled then
+						toggled = options.toggled
+						if toggled == false then
+							ToggleFrame.BackgroundColor3 = Color3.fromRGB(114, 118, 125)
+
+							ToggleFrameCircle.Name = "ToggleFrameCircle"
+							ToggleFrameCircle.Position = UDim2.new(0.234999999, -5, 0.133000001, 0)
+
+							Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+							Icon.Image = "http://www.roblox.com/asset/?id=6035047409"
+							Icon.ImageColor3 = Color3.fromRGB(114, 118, 125)
+						else
+							ToggleFrame.BackgroundColor3 = Color3.fromRGB(67,181,129)
+
+							ToggleFrameCircle.Name = "ToggleFrameCircle"
+							ToggleFrameCircle.Position = UDim2.new(0.655, -5, 0.133000001, 0)
+
+							Icon.BackgroundColor3 = Color3.fromRGB(67,181,129)
+							Icon.Image = "http://www.roblox.com/asset/?id=6023426926"
+							Icon.ImageColor3 = Color3.fromRGB(67,181,129)
+						end
+					end
 				end
 				
 				ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
